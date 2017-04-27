@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">ParisDinner</string>
+
+    <string name="user_by_format">Chez %s</string>
+    <string name="price_format">%1$d %2$s</string>
+    <string name="rating_format">(%d)</string>
+
 </resources>
