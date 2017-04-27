@@ -10,10 +10,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import adev.parisdinner.R;
 import adev.parisdinner.adapter.EventAdapter;
+import adev.parisdinner.manager.EventManager;
 import adev.parisdinner.model.Event;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -33,11 +35,15 @@ public class EventListFragment extends Fragment {
 
     Unbinder unbinder;
     private EventAdapter mEventAdapter;
+    private List<Event> mEvents = new ArrayList<>();
+    private int mFoodType;
+    private EventManager eventManager;
 
     public EventListFragment() {
     }
 
-    public EventListFragment setSection() {
+    public EventListFragment setFoodType(int foodType) {
+        this.mFoodType = foodType;
         return this;
     }
 
@@ -45,18 +51,20 @@ public class EventListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_list, container, false);
         unbinder = ButterKnife.bind(this, rootView);
+        eventManager = EventManager.getInstance();
 
-        GridLayoutManager glm = new GridLayoutManager(getContext(), 2);
+        GridLayoutManager glm = new GridLayoutManager(getContext(), 1);
         glm.setInitialPrefetchItemCount(8);
         mRecyclerView.setLayoutManager(glm);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
+        getEvents();
         return rootView;
     }
 
     private void getEvents() {
-
-        //setupRecycler(events);
+        mEvents = eventManager.getEventByFoodType(getActivity(), mFoodType);
+        setupRecycler(mEvents);
     }
 
     private void setupRecycler(List<Event> events) {

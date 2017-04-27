@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import adev.parisdinner.fragment.EventListFragment;
+import adev.parisdinner.model.Food;
 
 /**
  * Created by Aldric ANDRE
@@ -16,28 +17,28 @@ import adev.parisdinner.fragment.EventListFragment;
 
 public class SectionPagerAdapter extends FragmentPagerAdapter {
 
-    private List<String> mSections;
+    private List<Food> mFoods;
 
-    public SectionPagerAdapter(FragmentManager fm, List<String> sectionList) {
+    public SectionPagerAdapter(FragmentManager fm, List<Food> foods) {
         super(fm);
-        this.mSections = new ArrayList<>();
-        this.mSections.addAll(sectionList);
+        this.mFoods = new ArrayList<>();
+        this.mFoods.addAll(foods);
     }
 
     @Override
     public Fragment getItem(int position) {
 
-        Fragment fragment = new EventListFragment().setSection();
+        Fragment fragment = new EventListFragment().setFoodType(mFoods.get(position).getId());
         return fragment;
     }
 
     @Override
     public int getCount() {
-        return mSections.size();
+        return mFoods.size();
     }
 
     @Override
     public CharSequence getPageTitle(int position) {
-        return mSections.get(position);
+        return mFoods.get(position).getTitle();
     }
 }
