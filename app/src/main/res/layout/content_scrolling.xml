@@ -133,7 +133,24 @@
                         android:textSize="14sp"/>
 
                     <TextView
+                        android:id="@+id/txt_user_age"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="5dip"
+                        android:textAppearance="@style/Base.TextAppearance.AppCompat.SearchResult.Subtitle"
+                        android:textSize="18sp"/>
+
+                    <TextView
                         android:id="@+id/txt_user_language"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:padding="5dip"
+                        android:textAppearance="@style/Base.TextAppearance.AppCompat.SearchResult.Subtitle"
+                        android:textSize="18sp"/>
+
+                    <TextView
+                        android:id="@+id/txt_description_event"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:padding="5dip"

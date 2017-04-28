@@ -36,11 +36,11 @@ public class EventActivity extends AppCompatActivity implements OnMapReadyCallba
     private TextView mTypeView;
     private TextView mUserLanguageView;
     private TextView mRatingCountView;
+    private TextView mDescriptionView;
+    private TextView mAgeView;
     private ImageView mCoverEventView;
     private ImageView mUserImageView;
     private RatingBar mRatingUserView;
-    private SupportMapFragment mMapFragment;
-    private GoogleMap mMap;
     private CollapsingToolbarLayout mCollapsingToolbar;
 
     @Override
@@ -57,11 +57,13 @@ public class EventActivity extends AppCompatActivity implements OnMapReadyCallba
         mTypeView = (TextView) findViewById(R.id.txt_type_event);
         mRatingCountView = (TextView) findViewById(R.id.txt_rating_count);
         mUserLanguageView = (TextView) findViewById(R.id.txt_user_language);
+        mDescriptionView = (TextView) findViewById(R.id.txt_description_event);
+        mAgeView = (TextView) findViewById(R.id.txt_user_age);
         mCoverEventView = (ImageView) findViewById(R.id.img_detail_cover_event);
         mUserImageView = (ImageView) findViewById(R.id.img_user_event);
         mCollapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
         mRatingUserView = (RatingBar) findViewById(R.id.rating_details);
-        mMapFragment = (SupportMapFragment) getSupportFragmentManager()
+        SupportMapFragment mMapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
 
         mMapFragment.getMapAsync(this);
@@ -92,6 +94,9 @@ public class EventActivity extends AppCompatActivity implements OnMapReadyCallba
         mTypeView.setText(mTypeView.getContext().getResources().getString(R.string.place_type, mEvent.getTypeLocalized()));
         mRatingCountView.setText(mRatingCountView.getContext().getResources().getString(R.string.rating_detail_format, mEvent.getUser().getRating().getCount()));
 
+        mDescriptionView.setText(mEvent.getUser().getDescription());
+        mAgeView.setText(mEvent.getUser().getAge());
+
         String iSpeak = "";
         for (Language lang :
                 mEvent.getLanguages()) {
@@ -116,7 +121,7 @@ public class EventActivity extends AppCompatActivity implements OnMapReadyCallba
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
+        GoogleMap mMap = googleMap;
         mEvent.getPlace();
 
         LatLng eventPlace = new LatLng(mEvent.getPlace().getCoordinates().getLatitude(), mEvent.getPlace().getCoordinates().getLongitude());
