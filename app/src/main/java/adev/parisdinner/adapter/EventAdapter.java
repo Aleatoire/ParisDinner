@@ -28,7 +28,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventViewHolder> {
     public EventViewHolder onCreateViewHolder(ViewGroup viewGroup, int itemType) {
 
         View view = LayoutInflater.from(viewGroup.getContext())
-                .inflate(R.layout.dinner_grid_item, viewGroup, false);
+                .inflate(R.layout.event_grid_item, viewGroup, false);
 
         return new EventViewHolder(view);
     }
