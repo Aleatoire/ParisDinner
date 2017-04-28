@@ -13,6 +13,7 @@ public class Language {
     private boolean translated;
     private boolean activated;
     private String title;
+    @SerializedName("i_speak")
     private String iSpeak;
     private String alpha2;
     @SerializedName("alpha3-b")
