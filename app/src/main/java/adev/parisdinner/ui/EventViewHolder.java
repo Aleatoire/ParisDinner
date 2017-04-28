@@ -67,7 +67,7 @@ public class EventViewHolder extends RecyclerView.ViewHolder {
 
         Picasso.with(mCoverView.getContext())
                 .load(mEvent.getCover().getUrlPath())
-                .transform(new RoundedCornersTransformation(30, 3))
+                .transform(new RoundedCornersTransformation(10, 3))
                 .centerCrop()
                 .fit()
                 .into(mCoverView);
