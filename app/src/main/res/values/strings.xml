@@ -1,8 +1,18 @@
 <resources>
-    <string name="app_name">ParisDinner</string>
+    <string name="app_name" translatable="false">ParisDinner</string>
 
-    <string name="user_by_format">Chez %s</string>
+    <string name="user_by_format">%s\'s place</string>
     <string name="price_format">%1$d %2$s</string>
+    <string name="price_detail_format">Cost : %1$d %2$s</string>
     <string name="rating_format">(%d)</string>
+    <string name="rating_detail_format">%d votes</string>
+    <string name="food_type">%s\'s specialties</string>
+    <string name="place_type">To %s</string>
+    <string name="open_hour_format">Opening at %1$s to %2$s</string>
 
+    <plurals name="seat_count">
+        <item quantity="one">For %d seat</item>
+        <item quantity="other">For %d seats</item>
+    </plurals>
+    <string name="title_activity_maps">Map</string>
 </resources>

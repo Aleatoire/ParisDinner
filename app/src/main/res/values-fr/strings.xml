@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="user_by_format">Chez %s</string>
+    <string name="price_format">%1$d %2$s</string>
+    <string name="price_detail_format">Prix : %1$d %2$s</string>
+    <string name="rating_format">(%d)</string>
+    <string name="rating_detail_format">%d votes</string>
+    <string name="food_type">Spécialitées %s</string>
+    <string name="place_type">Pour %s</string>
+    <string name="open_hour_format">Ouvert de %1$s à %2$s</string>
+
+    <plurals name="seat_count">
+        <item quantity="one">Pour %d places</item>
+        <item quantity="other">Pour %d places</item>
+    </plurals>
+</resources>
