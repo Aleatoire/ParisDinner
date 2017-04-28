@@ -53,16 +53,15 @@ public class EventViewHolder extends RecyclerView.ViewHolder {
         this.mEvent = event;
 
         mTitleEvent.setText(mEvent.getTitle());
-        mUsername.setText(mCoverView.getContext().getResources().getString(R.string.user_by_format, mEvent.getUser().getFirstname()));
-        mRatingCount.setText(mCoverView.getContext().getResources().getString(R.string.rating_format, mEvent.getUser().getRating().getCount()));
-        mPrice.setText(mCoverView.getContext().getResources().getString(R.string.price_format, mEvent.getPrice(), mEvent.getCurrency().getSymbol()));
+        mUsername.setText(mUsername.getContext().getResources().getString(R.string.user_by_format, mEvent.getUser().getFirstname()));
+        mRatingCount.setText(mRatingCount.getContext().getResources().getString(R.string.rating_format, mEvent.getUser().getRating().getCount()));
+        mPrice.setText(mPrice.getContext().getResources().getString(R.string.price_format, mEvent.getPrice(), mEvent.getCurrency().getSymbol()));
         mRatingStar.setRating(mEvent.getUser().getRating().getScore());
 
         Picasso.with(mImageUserView.getContext())
                 .load(mEvent.getUser().getAvatar().getPath())
                 .centerCrop()
                 .transform(new RoundedCornersTransformation(90, 3))
-                .noFade()
                 .fit()
                 .into(mImageUserView);
 
@@ -70,7 +69,6 @@ public class EventViewHolder extends RecyclerView.ViewHolder {
                 .load(mEvent.getCover().getUrlPath())
                 .transform(new RoundedCornersTransformation(30, 3))
                 .centerCrop()
-                .noFade()
                 .fit()
                 .into(mCoverView);
     }
