@@ -7,10 +7,12 @@ import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import adev.parisdinner.model.Event;
 import adev.parisdinner.model.Food;
+import adev.parisdinner.utils.FoodAscComparator;
 
 /**
  * Created by Aldric ANDRE
@@ -77,6 +79,8 @@ public class EventManager {
             if (!isContainInFood(foodEvent))
                 mFoods.add(foodEvent);
         }
+
+        Collections.sort(mFoods, new FoodAscComparator());
         return mFoods;
     }
 
