@@ -6,13 +6,11 @@ import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
-import adev.parisdinner.model.Event;
-import adev.parisdinner.model.Food;
-import adev.parisdinner.utils.FoodAscComparator;
+import adev.parisdinner.api.EventService;
+import adev.parisdinner.api.ServiceGenerator;
+import adev.parisdinner.api.model.EventResponse;
+import retrofit2.Callback;
 
 /**
  * Created by Aldric ANDRE
@@ -23,8 +21,6 @@ public class EventManager {
     private static final String TAG = "EventManager";
 
     private static EventManager instance;
-    private static ArrayList<Event> mEvents;
-    private static List<Food> mFoods;
 
     //region Constructor
     private EventManager() {
@@ -36,88 +32,19 @@ public class EventManager {
     public static EventManager getInstance() {
         if (EventManager.instance == null) {
             EventManager.instance = new EventManager();
-            EventManager.mEvents = new ArrayList<>();
-            EventManager.mFoods = new ArrayList<>();
         }
         return EventManager.instance;
     }
     //endregion
 
-
-    public List<Event> getAllEvents(Activity activity) {
-        if (mEvents == null
-                || mEvents.isEmpty())
-            loadEvents(activity);
-
-        return mEvents;
-    }
-
-    public List<Event> getEventByFoodType(Activity activity, int foodType) {
-        List<Event> listEvents = new ArrayList<>();
-
-        if (mEvents == null
-                || mEvents.isEmpty())
-            loadEvents(activity);
-
-        for (Event event : mEvents) {
-            if (event.getFood().getId() == foodType)
-                listEvents.add(event);
-        }
-
-        return listEvents;
-    }
-
-    public List<Food> getFoods(Activity activity) {
-        if (mEvents == null
-                || mEvents.isEmpty())
-            loadEvents(activity);
-
-        for (Event event :
-                mEvents) {
-            Food foodEvent = event.getFood();
-
-            if (!isContainInFood(foodEvent))
-                mFoods.add(foodEvent);
-        }
-
-        Collections.sort(mFoods, new FoodAscComparator());
-        return mFoods;
-    }
-
-    public Event getEventById(Activity activity, int id) {
-        if (mEvents == null
-                || mEvents.isEmpty())
-            loadEvents(activity);
-
-        for (Event event :
-                mEvents) {
-            if (event.getId() == id)
-                return event;
-        }
-
-        return null;
-    }
-
-    private boolean isContainInFood(Food eventFood) {
-        if (mFoods.isEmpty())
-            return false;
-        else {
-            int i = 0;
-            while (i < mFoods.size()) {
-                Food food = mFoods.get(i);
-                if (food.getId() == eventFood.getId()) {
-                    return true;
-                }
-                i++;
-            }
-            return false;
-        }
-    }
-
-    private void loadEvents(Activity activity) {
+    public EventResponse getOfflineEvents(Activity activity) {
         Gson gson = new Gson();
-        EventResponse eventResponse = gson.fromJson(loadJSONFromAsset(activity), EventResponse.class);
-        mEvents.addAll(eventResponse.getEvents());
+        return gson.fromJson(loadJSONFromAsset(activity), EventResponse.class);
+    }
+
+    public void getOnlineEvents(Callback<EventResponse> callback) {
+        EventService eventService = ServiceGenerator.createService(EventService.class);
+        eventService.getEvents().enqueue(callback);
     }
 
     private String loadJSONFromAsset(Activity activity) {
@@ -134,24 +61,5 @@ public class EventManager {
             return null;
         }
         return json;
-    }
-
-    class EventResponse {
-        public EventResponse() {
-        }
-
-        public EventResponse(List<Event> events) {
-            this.events = events;
-        }
-
-        List<Event> events;
-
-        public List<Event> getEvents() {
-            return events;
-        }
-
-        public void setEvents(List<Event> events) {
-            this.events = events;
-        }
     }
 }

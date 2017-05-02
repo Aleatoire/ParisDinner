@@ -10,16 +10,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import adev.parisdinner.R;
 import adev.parisdinner.adapter.EventAdapter;
+import adev.parisdinner.api.model.EventResponse;
 import adev.parisdinner.manager.EventManager;
-import adev.parisdinner.model.Event;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * Created by Aldric ANDRE
@@ -34,10 +34,7 @@ public class EventListFragment extends Fragment {
     LinearLayout mLoader;
 
     Unbinder unbinder;
-    private EventAdapter mEventAdapter;
-    private List<Event> mEvents = new ArrayList<>();
     private int mFoodType;
-    private EventManager eventManager;
 
     public EventListFragment() {
     }
@@ -51,7 +48,6 @@ public class EventListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_list, container, false);
         unbinder = ButterKnife.bind(this, rootView);
-        eventManager = EventManager.getInstance();
 
         GridLayoutManager glm = new GridLayoutManager(getContext(), 1);
         glm.setInitialPrefetchItemCount(8);
@@ -63,16 +59,34 @@ public class EventListFragment extends Fragment {
     }
 
     private void getEvents() {
-        mEvents = eventManager.getEventByFoodType(getActivity(), mFoodType);
-        setupRecycler(mEvents);
+        EventManager.getInstance().getOnlineEvents(new Callback<EventResponse>() {
+            @Override
+            public void onResponse(Call<EventResponse> call, Response<EventResponse> response) {
+                if (response.isSuccessful())
+                    setupRecycler(response.body());
+                else
+                    setupRecycler(null);
+            }
+
+            @Override
+            public void onFailure(Call<EventResponse> call, Throwable t) {
+                setupRecycler(null);
+            }
+        });
+
     }
 
-    private void setupRecycler(List<Event> events) {
-        mEventAdapter = new EventAdapter(events);
-        mRecyclerView.setAdapter(mEventAdapter);
-        mEventAdapter.notifyDataSetChanged();
-        mRecyclerView.invalidate();
-        mLoader.setVisibility(View.GONE);
+    private void setupRecycler(EventResponse eventResponse) {
+        if (eventResponse == null)
+            eventResponse = EventManager.getInstance().getOfflineEvents(getActivity());
+
+        if (getView() != null) {
+            EventAdapter mEventAdapter = new EventAdapter(eventResponse.getEventByFoodType(mFoodType));
+            mRecyclerView.setAdapter(mEventAdapter);
+            mEventAdapter.notifyDataSetChanged();
+            mRecyclerView.invalidate();
+            mLoader.setVisibility(View.GONE);
+        }
     }
 
     @Override

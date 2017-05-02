@@ -18,55 +18,67 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.squareup.picasso.Picasso;
 
 import adev.parisdinner.R;
+import adev.parisdinner.api.model.EventResponse;
 import adev.parisdinner.manager.EventManager;
 import adev.parisdinner.model.Event;
 import adev.parisdinner.model.Language;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class EventActivity extends AppCompatActivity implements OnMapReadyCallback {
+    private final static String TAG = "EventActivity";
+
+    @BindView(R.id.img_detail_cover_event)
+    ImageView mCoverEventView;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.toolbar_layout)
+    CollapsingToolbarLayout mCollapsingToolbar;
+    @BindView(R.id.txt_type_event)
+    TextView mTypeView;
+    @BindView(R.id.txt_food_type_event)
+    TextView mFoodTypeView;
+    @BindView(R.id.txt_open_hour_event)
+    TextView mOpenHoursView;
+    @BindView(R.id.txt_money_detail)
+    TextView mMoneyView;
+    @BindView(R.id.txt_seats_count)
+    TextView mSeatCountView;
+    @BindView(R.id.img_user_event)
+    ImageView mUserImageView;
+    @BindView(R.id.txt_user_name_event)
+    TextView mUsernameView;
+    @BindView(R.id.rating_details)
+    RatingBar mRatingUserView;
+    @BindView(R.id.txt_rating_count)
+    TextView mRatingCountView;
+    @BindView(R.id.txt_user_language)
+    TextView mUserLanguageView;
+    @BindView(R.id.txt_user_age)
+    TextView mAgeView;
+    @BindView(R.id.txt_description_event)
+    TextView mDescriptionView;
+    SupportMapFragment mMapFragment;
 
     private int mEventId;
     private Event mEvent;
-
-    private TextView mUsernameView;
-    private TextView mOpenHoursView;
-    private TextView mSeatCountView;
-    private TextView mMoneyView;
-    private TextView mFoodTypeView;
-    private TextView mTypeView;
-    private TextView mUserLanguageView;
-    private TextView mRatingCountView;
-    private TextView mDescriptionView;
-    private TextView mAgeView;
-    private ImageView mCoverEventView;
-    private ImageView mUserImageView;
-    private RatingBar mRatingUserView;
-    private CollapsingToolbarLayout mCollapsingToolbar;
+    private GoogleMap mMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scrolling);
+        ButterKnife.bind(this);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        mUsernameView = (TextView) findViewById(R.id.txt_user_name_event);
-        mOpenHoursView = (TextView) findViewById(R.id.txt_open_hour_event);
-        mSeatCountView = (TextView) findViewById(R.id.txt_seats_count);
-        mMoneyView = (TextView) findViewById(R.id.txt_money_detail);
-        mFoodTypeView = (TextView) findViewById(R.id.txt_food_type_event);
-        mTypeView = (TextView) findViewById(R.id.txt_type_event);
-        mRatingCountView = (TextView) findViewById(R.id.txt_rating_count);
-        mUserLanguageView = (TextView) findViewById(R.id.txt_user_language);
-        mDescriptionView = (TextView) findViewById(R.id.txt_description_event);
-        mAgeView = (TextView) findViewById(R.id.txt_user_age);
-        mCoverEventView = (ImageView) findViewById(R.id.img_detail_cover_event);
-        mUserImageView = (ImageView) findViewById(R.id.img_user_event);
-        mCollapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
-        mRatingUserView = (RatingBar) findViewById(R.id.rating_details);
-        SupportMapFragment mMapFragment = (SupportMapFragment) getSupportFragmentManager()
+        mMapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
 
         mMapFragment.getMapAsync(this);
+
         setSupportActionBar(toolbar);
 
         if (getIntent() != null) {
@@ -78,11 +90,31 @@ public class EventActivity extends AppCompatActivity implements OnMapReadyCallba
     protected void onStart() {
         super.onStart();
         if (mEventId != 0)
-            setUpView();
+            getEvent();
     }
 
-    public void setUpView() {
-        mEvent = EventManager.getInstance().getEventById(this, mEventId);
+    private void getEvent() {
+        EventManager.getInstance().getOnlineEvents(new Callback<EventResponse>() {
+            @Override
+            public void onResponse(Call<EventResponse> call, Response<EventResponse> response) {
+                if (response.isSuccessful())
+                    setUpView(response.body());
+                else
+                    setUpView(null);
+            }
+
+            @Override
+            public void onFailure(Call<EventResponse> call, Throwable t) {
+                setUpView(null);
+            }
+        });
+    }
+
+    public void setUpView(EventResponse eventResponse) {
+        if (eventResponse == null)
+            eventResponse = EventManager.getInstance().getOfflineEvents(this);
+
+        mEvent = eventResponse.getEventById(mEventId);
 
         mCollapsingToolbar.setTitle(mEvent.getTitle());
         mUsernameView.setText(mUsernameView.getContext().getResources().getString(R.string.user_by_format, mEvent.getUser().getFirstname()));
@@ -116,22 +148,37 @@ public class EventActivity extends AppCompatActivity implements OnMapReadyCallba
                 .transform(new RoundedCornersTransformation(90, 3))
                 .fit()
                 .centerCrop()
-                .into(mUserImageView);
+                .into(mUserImageView, new com.squareup.picasso.Callback() {
+                    @Override
+                    public void onSuccess() {
+                        if (mMap != null)
+                            onMapReady(mMap);
+                    }
+
+                    @Override
+                    public void onError() {
+
+                    }
+                });
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        GoogleMap mMap = googleMap;
-        mEvent.getPlace();
+        mMap = googleMap;
 
-        LatLng eventPlace = new LatLng(mEvent.getPlace().getCoordinates().getLatitude(), mEvent.getPlace().getCoordinates().getLongitude());
-        Marker marker = googleMap.addMarker(new MarkerOptions()
-                .position(eventPlace)
-                .title(mEvent.getTitle())
-                .snippet(mEvent.getUser().getFirstname()));
+        if (mEvent != null) {
+            mEvent.getPlace();
 
-        marker.showInfoWindow();
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(eventPlace, mEvent.getPlace().getCoordinates().getZoom()));
+            LatLng eventPlace = new LatLng(mEvent.getPlace().getCoordinates().getLatitude(), mEvent.getPlace().getCoordinates().getLongitude());
+            Marker marker = googleMap.addMarker(new MarkerOptions()
+                    .position(eventPlace)
+                    .title(mEvent.getTitle())
+                    .snippet(mEvent.getUser().getFirstname()));
+
+            marker.showInfoWindow();
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(eventPlace, mEvent.getPlace().getCoordinates().getZoom()));
+        }
+
     }
 
 }
